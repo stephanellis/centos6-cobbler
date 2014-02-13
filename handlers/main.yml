@@ -11,5 +11,5 @@
 - name: cobbler sync
   action: raw cobbler sync
 
-- name: restart named
-  action: service name=named state=restarted
+- name: install cobbler_unconfined selinux policy
+  shell: semodule -i /root/cobbler_unconfined.pp

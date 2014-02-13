@@ -1,4 +1,10 @@
 ---
 dependencies:
-  - centos6-base
-  - centos6-firewall
+  - role: centos6-base
+  - role: centos6-firewall
+    ruleset_prio: 30
+    ruleset_name: cobbler
+    ruleset:
+      - {protocol: udp, port: 69}
+      - {protocol: tcp, port: 69}
+      - {protocol: tcp, port: 80}

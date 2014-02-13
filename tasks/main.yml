@@ -5,14 +5,18 @@
     - cobbler
     - fence-agents
 
-- name: chkconfig on and start apache
-  action: service name=httpd state=started enabled=yes
+- name: set selinux booleans for cobbler and httpd
+  seboolean: name={{ item }} state=1
+  with_items:
+    - httpd_can_network_connect_cobbler
+    - httpd_serve_cobbler_files
+    - cobbler_can_network_connect
 
-- name: chkconfig on and start cobblerd
-  action: service name=cobblerd state=started enabled=yes
+- name: copy cobbler_unconfined selinux policy
+  copy: src=cobbler_unconfined.pp dest=/root/
+  notify: install cobbler_unconfined selinux policy
 
-- name: chkconfig on and start xinetd
-  action: service name=xinetd state=started enabled=yes
+- meta: flush_handlers
 
 - name: copy xinetd configs
   copy: src={{ item }} dest=/etc/xinetd.d/
@@ -22,9 +26,10 @@
   notify: restart xinetd
   tags: xinetd-config
 
-- name: ensure dhcp and named are chkconfiged on
+- name: start and enable services
   service: name={{ item }} state=started enabled=yes
   with_items:
-    - named
-    - dhcpd
+    - httpd
+    - xinetd
+    - cobblerd
 
