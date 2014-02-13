@@ -1,3 +1,4 @@
 ---
 dependencies:
-  - ansible-centos6-base
+  - centos6-base
+  - centos6-firewall
