@@ -1,0 +1,3 @@
+---
+dependencies:
+  - ansible-centos6-base

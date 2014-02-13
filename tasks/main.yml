@@ -1,0 +1,66 @@
+---
+- name: install cobbler
+  action: yum name={{ item }} state=installed
+  with_items:
+    - cobbler
+    - fence-agents
+
+- name: run httpd.conf template
+  template: src=httpd.conf dest=/etc/httpd/conf/httpd.conf
+  notify: restart httpd
+
+- name: chkconfig on and start apache
+  action: service name=httpd state=started enabled=yes
+
+- name: chkconfig on and start cobblerd
+  action: service name=cobblerd state=started enabled=yes
+
+- name: copy xinetd configs
+  copy: src={{ item }} dest=/etc/xinetd.d/
+  with_items:
+    - rsync
+    - tftp
+  notify: restart xinetd
+  tags: xinetd-config
+
+- name: chkconfig on and start xinetd
+  action: service name=xinetd state=started enabled=yes
+
+- name: run cobbler settings template
+  template: src=settings dest=/etc/cobbler/settings
+  notify:
+    - restart cobblerd
+    - cobbler sync
+  tags: cobblersettings
+
+- name: run cobbler dhcp template
+  copy: src=dhcp.template dest=/etc/cobbler/
+  notify:
+    - restart cobblerd
+    - cobbler sync
+
+- name: run cobbler default ks template
+  template: src=sample.ks dest=/var/lib/cobbler/kickstarts/sample.ks
+  notify:
+    - restart cobblerd
+    - cobbler sync
+
+- name: run cobbler ks authkeys snippets template
+  template: src=post_authkeys_bmi_ltn dest=/var/lib/cobbler/snippets/post_authkeys_bmi_ltn
+  notify:
+    - restart cobblerd
+    - cobbler sync
+  tags: deployerpubkeys
+
+- name: copy named.template
+  copy: src=named.template dest=/etc/cobbler/named.template
+  notify:
+    - cobbler sync
+  tags: named
+
+- name: ensure dhcp and named are chkconfiged on
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - named
+    - dhcpd
+
