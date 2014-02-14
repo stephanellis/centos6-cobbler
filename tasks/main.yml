@@ -6,7 +6,7 @@
     - fence-agents
 
 - name: set selinux booleans for cobbler and httpd
-  seboolean: name={{ item }} state=1
+  seboolean: name={{ item }} state=1 persistent=yes
   with_items:
     - httpd_can_network_connect_cobbler
     - httpd_serve_cobbler_files
