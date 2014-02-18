@@ -13,3 +13,12 @@
 
 - name: install cobbler_unconfined selinux policy
   shell: semodule -i /root/cobbler_unconfined.pp
+
+- name: cobbler get loaders
+  shell: cobbler get-loaders
+  notify: cobbler signature update
+
+- name: cobbler signature update
+  shell: cobbler signature update
+  notify: cobbler sync
+

@@ -32,4 +32,5 @@
     - httpd
     - xinetd
     - cobblerd
+  notify: cobbler get loaders
 
