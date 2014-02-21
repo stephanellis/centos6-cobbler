@@ -1,6 +1,5 @@
 ---
 dependencies:
-  - role: centos6-base
   - role: centos6-firewall
     ruleset_prio: 30
     ruleset_name: cobbler
